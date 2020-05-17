@@ -1,20 +1,18 @@
 import extract_features as ef
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for, session
 import psycopg2
 import credentials as cr
 from datetime import date
 
 app = Flask(__name__)
 
+
 con = psycopg2.connect(host='localhost', database=cr.db_name, user=cr.username, password=cr.password)
 cur = con.cursor()
-state = 0
 
 
 @app.route('/')
 def run_index():
-    global state
-    state = 0
     return render_template('index.html')
 
 
@@ -23,12 +21,23 @@ def run_aboutUs():
     return render_template('aboutUs.html')
 
 
-@app.route('/admin')
+@app.route('/admin', methods=['POST', 'GET'])
 def run_admin():
-    global state
-    if state == 1:
-        return render_template('admin2.html')
-    return render_template('admin.html')
+    if request.method == 'POST':
+        id = request.form.get('id')
+        password = request.form.get('password')
+        query = "select * from admin where id='" + id + "' and password='" + password + "';"
+        cur.execute(query)
+        result = cur.fetchall()
+        if result:
+            session['id'] = id
+            return redirect(url_for('login'))
+        else:
+            return render_template('admin.html')
+    else:
+        if 'id' in session:
+            return redirect(url_for('login'))
+        return render_template('admin.html')
 
 
 @app.route('/feedback')
@@ -65,21 +74,14 @@ def geturl():
     return result
 
 
-@app.route('/admindetails', methods=['POST'])
-def admin_deatils():
-    id = request.form.get('id')
-    password = request.form.get('password')
-
-    query = "select * from admin where id='" + id + "' and password='" + password + "';"
-    cur.execute(query)
-    for i in cur.fetchall():
-        if i:
-            global state
-            state = 1
-            return render_template('admin2.html')
-    return render_template('admin.html')
+@app.route('/logout')
+def logout():
+    session.pop('id', None)
+    return redirect(url_for('run_admin'))
 
 
-url = input('Enter a url: ')
-print('URL: ', url)
-ef.go(url)
+@app.route('/login')
+def login():
+    if 'id' in session:
+        return render_template('admin2.html')
+    return redirect(url_for('run_admin'))
