@@ -5,10 +5,10 @@ import credentials as cr
 from datetime import date, timedelta
 
 app = Flask(__name__)
-
+app.secret_key = cr.secret_key
 app.permanent_session_lifetime = timedelta(hours=cr.time)
 
-con = psycopg2.connect(host='localhost', database=cr.db_name, user=cr.username, password=cr.password)
+con = psycopg2.connect(host=cr.host, database=cr.db_name, user=cr.username, password=cr.password)
 cur = con.cursor()
 
 
@@ -87,3 +87,11 @@ def login():
     if 'id' in session:
         return render_template('admin2.html')
     return redirect(url_for('run_admin'))
+
+
+@app.route('/viewlist')
+def viewlist():
+    query = "select * from phishing_urls;"
+    cur.execute(query)
+    blacklist = cur.fetchall()
+    return render_template('viewlist.html', blacklist=blacklist)

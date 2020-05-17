@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Blacklist
+{% endblock %}
+
+{% block content %}
+<container>
+<section class="section">
+        <center>
+            <h1 style="color:gray; font-weight: bold; font-size: 70px; padding-top: 1cm; font-size: 90px;">BLACKLIST</h1>
+        </center>
+</section>
+<section>
+    <center>
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th  scope="col">URLS</th>
+                    <th  scope="col">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in blacklist %}
+                    <tr>
+                        {% for j in i[1:] %}
+                            <td>{{j}}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </center>
+</section>
+    </container>
+{% endblock %}
