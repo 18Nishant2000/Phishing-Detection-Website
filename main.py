@@ -1,5 +1,5 @@
 import extract_features as ef
-from flask import Flask, request, render_template, redirect, url_for, session
+from flask import Flask, request, render_template, redirect, url_for, session, flash
 import psycopg2
 import credentials as cr
 from datetime import date, timedelta
@@ -95,3 +95,16 @@ def viewlist():
     cur.execute(query)
     blacklist = cur.fetchall()
     return render_template('viewlist.html', blacklist=blacklist)
+
+
+@app.route('/feedback', methods=['POST'])
+def feedback():
+    if request.method == 'POST':
+        name = request.form.get('fname')
+        email = request.form.get('email')
+        comments = request.form.get('comments')
+        query = f"insert into Feedback(Name,Email,Comments) values('{name}','{email}','{comments}');"
+        cur.execute(query)
+        con.commit()
+        flash(f'Thank You {name}. Your Feedback is Submitted')
+        return redirect(url_for('run_feedback'))
