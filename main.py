@@ -2,10 +2,11 @@ import extract_features as ef
 from flask import Flask, request, render_template, redirect, url_for, session
 import psycopg2
 import credentials as cr
-from datetime import date
+from datetime import date, timedelta
 
 app = Flask(__name__)
 
+app.permanent_session_lifetime = timedelta(hours=cr.time)
 
 con = psycopg2.connect(host='localhost', database=cr.db_name, user=cr.username, password=cr.password)
 cur = con.cursor()
@@ -30,6 +31,7 @@ def run_admin():
         cur.execute(query)
         result = cur.fetchall()
         if result:
+            session.permanent = True
             session['id'] = id
             return redirect(url_for('login'))
         else:
