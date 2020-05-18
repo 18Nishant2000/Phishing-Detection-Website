@@ -12,19 +12,19 @@
       <img src="/static/assets/img/path4.png" class="path">
         <div class="container align-items-center">
             <center>
-                <h1 style="color:gray; font-weight: bold; font-size: 70px; padding-top: 3cm; font-size: 90px;">BLACKLIST</h1>
+                <h1 style="color:gray; font-weight: bold; font-size: 70px; padding-top: 3cm; font-size: 90px;">USERS</h1>
             </center>
             <div class="accordion" id="accordionExample">
                 <table class="table table-striped">
                     <thead>
                         <tr>
                             <th  scope="col"><center>S.NO.</center></th>
-                            <th  scope="col"><center>URLS</center></th>
-                            <th  scope="col"><center>DATE</center></th>
+                            <th  scope="col"><center>NAME</center></th>
+                            <th  scope="col"><center>EMAIL</center></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for i in blacklist %}
+                        {% for i in users %}
                             <tr>
                                 {% for j in i %}
                                 <td><center>{{j}}</center></td>

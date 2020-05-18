@@ -130,3 +130,9 @@ def feedback():
         flash(f'Thank You {name}. Your Feedback is Submitted')
         return redirect(url_for('run_feedback'))
 
+@app.route('/viewusers')
+def viewusers():
+    query = "select * from feedback;"
+    cur.execute(query)
+    users = cur.fetchall()
+    return render_template('viewusers.html', users=users)
