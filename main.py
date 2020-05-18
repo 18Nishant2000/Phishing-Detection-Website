@@ -136,3 +136,24 @@ def viewusers():
     cur.execute(query)
     users = cur.fetchall()
     return render_template('viewusers.html', users=users)
+
+@app.route('/add', methods=['GET', 'POST'])
+def add_to_blacklist():
+    if request.method == 'GET':
+        return render_template('add_to_blacklist.html')
+    else:
+        url = request.form.get('url')
+        query = "select * from phishing_urls where url='" + url + "';"
+        cur.execute(query)
+        for i in cur.fetchall():
+            if i:
+                flash('Entered URL is already been blacklisted')
+                return redirect(url_for('add_to_blacklist'))
+        query = "insert into phishing_urls(url,date) values('" + url + "',DATE '" + str(date.today()) + "');"
+        cur.execute(query)
+        con.commit()
+        flash('Entered URL is added to blacklist successfully')
+        return redirect(url_for('add_to_blacklist'))
+
+
+
