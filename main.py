@@ -3,14 +3,22 @@ from flask import Flask, request, render_template, redirect, url_for, session, f
 import psycopg2
 import credentials as cr
 from datetime import date, timedelta
+from flask_mail import *
+
 
 app = Flask(__name__)
 app.secret_key = cr.secret_key
 app.permanent_session_lifetime = timedelta(hours=cr.time)
+app.config['MAIL_SERVER'] = cr.mail_server
+app.config['MAIL_PORT'] = cr.mail_port
+app.config['MAIL_USERNAME'] = cr.mail_username
+app.config['MAIL_PASSWORD'] = cr.mail_password
+app.config['MAIL_USE_TLS'] = cr.mail_use_tls
+app.config['MAIL_USE_SSL'] = cr.mail_use_ssl
 
 con = psycopg2.connect(host=cr.host, database=cr.db_name, user=cr.username, password=cr.password)
 cur = con.cursor()
-
+mail = Mail(app)
 
 @app.route('/')
 def run_index():
@@ -47,9 +55,22 @@ def run_feedback():
     return render_template('feedback.html')
 
 
-@app.route('/contactUs')
+@app.route('/contactUs', methods=['GET', 'POST'])
 def run_contactUs():
-    return render_template('contactUs.html')
+    if request.method == 'GET':
+        return render_template('contactUs.html')
+    else:
+        name = request.form.get('name')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        company = request.form.get('company')
+        message = request.form.get('message')
+        msg = Message('CONTACT US', sender=cr.username, recipients=[email])
+        msg.body = f'Hey I am {name}.\n\n{message}\n\nFrom {company}\n{phone}'
+        mail.send(msg)
+        flash(f'Congratulations {name}!! Mail Sent.')
+        return redirect(url_for('run_contactUs'))
+
 
 
 @app.route('/faq')
@@ -100,7 +121,7 @@ def viewlist():
 @app.route('/feedback', methods=['POST'])
 def feedback():
     if request.method == 'POST':
-        name = request.form.get('fname')
+        name = request.form.get('name')
         email = request.form.get('email')
         comments = request.form.get('comments')
         query = f"insert into Feedback(Name,Email,Comments) values('{name}','{email}','{comments}');"
@@ -108,3 +129,4 @@ def feedback():
         con.commit()
         flash(f'Thank You {name}. Your Feedback is Submitted')
         return redirect(url_for('run_feedback'))
+
