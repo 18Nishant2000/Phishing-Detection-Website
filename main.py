@@ -155,5 +155,28 @@ def add_to_blacklist():
         flash('Entered URL is added to blacklist successfully')
         return redirect(url_for('add_to_blacklist'))
 
+@app.route('/feedbacks')
+def feedbacks():
+    query = "select * from feedback;"
+    cur.execute(query)
+    feedbacks = cur.fetchall()
+    return render_template('viewfeedback.html', feedbacks=feedbacks)
+
+@app.route('/remove', methods=['GET', 'POST'])
+def remove_from_blacklist():
+    if request.method == 'GET':
+        return render_template('remove_from_blacklist.html')
+    else:
+        url = request.form.get('url')
+        query = "select * from phishing_urls where url='" + url + "';"
+        cur.execute(query)
+        for i in cur.fetchall():
+            if i:
+                query = "delete from phishing_urls where url='" + url + "';"
+                cur.execute(query)
+                flash('Entered URL has been removed from the blacklist')
+                return redirect(url_for('remove_from_blacklist'))
+        flash('FAIL..entered URL is not present in the blacklist')
+        return redirect(url_for('remove_from_blacklist'))
 
 

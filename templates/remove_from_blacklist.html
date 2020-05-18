@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Add to Blacklist
+    Remove from Blacklist
 {% endblock %}
 
 {% block content %}
@@ -12,17 +12,17 @@
       <img src="/static/assets/img/path4.png" class="path">
         <div class="container align-items-center">
             <center>
-                <h1 style="color:gray; font-weight: bold; font-size: 70px; padding-top: 3cm; font-size: 90px;">ADD TO BLACKLIST</h1>
+                <h1 style="color:gray; font-weight: bold; font-size: 70px; padding-top: 3cm; font-size: 90px;">REMOVE URL</h1>
             </center>
             <div class="accordion" id="accordionExample">
-                <form method="post" action="/add">
+                <form method="post" action="/remove">
                   <div class="form-group">
                     <label for="exampleInputEmail1">Url</label>
                     <input type="text" name="url" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                   </div>
                   <div class="checkbox">
                     <input type="checkbox" class="checkbox" id="checkbox" required>
-                    <label class="checkbox" for="checkbox">Confirm to add the above url into blacklist</label>
+                    <label class="checkbox" for="checkbox">Confirm to remove the above url from the blacklist</label>
                   </div>
                   <center><input type="submit" class="btn btn-primary" value="Submit"></center>
                 </form>
