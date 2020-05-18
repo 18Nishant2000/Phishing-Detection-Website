@@ -5,7 +5,6 @@ import credentials as cr
 from datetime import date, timedelta
 from flask_mail import *
 
-
 app = Flask(__name__)
 app.secret_key = cr.secret_key
 app.permanent_session_lifetime = timedelta(hours=cr.time)
@@ -19,6 +18,7 @@ app.config['MAIL_USE_SSL'] = cr.mail_use_ssl
 con = psycopg2.connect(host=cr.host, database=cr.db_name, user=cr.username, password=cr.password)
 cur = con.cursor()
 mail = Mail(app)
+
 
 @app.route('/')
 def run_index():
@@ -50,11 +50,6 @@ def run_admin():
         return render_template('admin.html')
 
 
-@app.route('/feedback')
-def run_feedback():
-    return render_template('feedback.html')
-
-
 @app.route('/contactUs', methods=['GET', 'POST'])
 def run_contactUs():
     if request.method == 'GET':
@@ -70,7 +65,6 @@ def run_contactUs():
         mail.send(msg)
         flash(f'Congratulations {name}!! Mail Sent.')
         return redirect(url_for('run_contactUs'))
-
 
 
 @app.route('/faq')
@@ -118,7 +112,7 @@ def viewlist():
     return render_template('viewlist.html', blacklist=blacklist)
 
 
-@app.route('/feedback', methods=['POST'])
+@app.route('/feedback', methods=['POST', 'GET'])
 def feedback():
     if request.method == 'POST':
         name = request.form.get('name')
@@ -129,6 +123,9 @@ def feedback():
         con.commit()
         flash(f'Thank You {name}. Your Feedback is Submitted')
         return redirect(url_for('run_feedback'))
+    else:
+        return render_template('feedback.html')
+
 
 @app.route('/viewusers')
 def viewusers():
@@ -136,6 +133,7 @@ def viewusers():
     cur.execute(query)
     users = cur.fetchall()
     return render_template('viewusers.html', users=users)
+
 
 @app.route('/add', methods=['GET', 'POST'])
 def add_to_blacklist():
@@ -155,12 +153,14 @@ def add_to_blacklist():
         flash('Entered URL is added to blacklist successfully')
         return redirect(url_for('add_to_blacklist'))
 
+
 @app.route('/feedbacks')
 def feedbacks():
     query = "select * from feedback;"
     cur.execute(query)
     feedbacks = cur.fetchall()
     return render_template('viewfeedback.html', feedbacks=feedbacks)
+
 
 @app.route('/remove', methods=['GET', 'POST'])
 def remove_from_blacklist():
@@ -178,5 +178,3 @@ def remove_from_blacklist():
                 return redirect(url_for('remove_from_blacklist'))
         flash('FAIL..entered URL is not present in the blacklist')
         return redirect(url_for('remove_from_blacklist'))
-
-

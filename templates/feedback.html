@@ -101,10 +101,9 @@
                 {% block content %}
                   {% with messages = get_flashed_messages() %}
                     {% if messages %}
-                      <div class="alert" style="background-color:orange">
+                      <div class="alert">
                       {% for i in messages %}
-                        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-                        {{i}}
+                        <span class="closebtn" onclick="this.parentElement.style.display='none';" style="background-color:orange">&times; {{i}}</span>
                       {% endfor %}
                       </div>
                     {% endif %}
