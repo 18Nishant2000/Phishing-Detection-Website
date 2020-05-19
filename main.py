@@ -60,8 +60,8 @@ def run_contactUs():
         phone = request.form.get('phone')
         company = request.form.get('company')
         message = request.form.get('message')
-        msg = Message('CONTACT US', sender=cr.username, recipients=[email])
-        msg.body = f'Hey I am {name}.\n\n{message}\n\nFrom {company}\n{phone}'
+        msg = Message('CONTACT US', sender=cr.mail_username, recipients=[cr.mail_username])
+        msg.body = f'Hey I am {name}.\n\n{message}\n\nFrom {company}\n{phone}\n{email}'
         mail.send(msg)
         flash(f'Congratulations {name}!! Mail Sent.')
         return redirect(url_for('run_contactUs'))
@@ -100,7 +100,7 @@ def logout():
 @app.route('/login')
 def login():
     if 'id' in session:
-        return render_template('admin2.html')
+        return redirect(url_for('viewlist'))
     return redirect(url_for('run_admin'))
 
 
@@ -115,14 +115,20 @@ def viewlist():
 @app.route('/feedback', methods=['POST', 'GET'])
 def feedback():
     if request.method == 'POST':
-        name = request.form.get('name')
+        name = request.form.get('fname')
         email = request.form.get('email')
         comments = request.form.get('comments')
+        query = f"select email from Feedback where email='{email}';"
+        cur.execute(query)
+        for i in cur.fetchall():
+            if i:
+                flash(f'Sorry {name}! You have already given your valuable feedback to us.')
+                return redirect(url_for('feedback'))
         query = f"insert into Feedback(Name,Email,Comments) values('{name}','{email}','{comments}');"
         cur.execute(query)
         con.commit()
         flash(f'Thank You {name}. Your Feedback is Submitted')
-        return redirect(url_for('run_feedback'))
+        return redirect(url_for('feedback'))
     else:
         return render_template('feedback.html')
 
