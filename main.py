@@ -81,14 +81,16 @@ def geturl():
     for i in cur.fetchall():
         if i:
             print('Found in DATABASE')
-            return 'Phishing URL'
+            flash('PHISHING URL')
+            return redirect(url_for('run_index'))
     result = ef.go(url)
     ef.data = []
-    if result == 'Phishing URL':
+    if result == 'PHISHING URL':
         query = "insert into phishing_urls(url,date) values('" + url + "',DATE '" + str(date.today()) + "');"
         cur.execute(query)
         con.commit()
-    return result
+    flash(result)
+    return redirect(url_for('run_index'))
 
 
 @app.route('/logout')

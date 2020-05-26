@@ -33,7 +33,7 @@ def shorten_url(url):
     try:
         if url[:4] != 'http':
             url = 'https://' + url
-        response = requests.get(url)
+        response = requests.get(url,timeout=3)
         original_url = response.url
         result = length_url(original_url)
         data.append(result)
@@ -105,7 +105,7 @@ def https_token(url):
 
 def submitting_to_email(url):
     try:
-        response = requests.get(url)
+        response = requests.get(url,timeout=3)
         mail_count = response.text.count('mail')
         mailto_count = response.text.count('mailto')
         if mail_count and mailto_count:
@@ -118,7 +118,7 @@ def submitting_to_email(url):
 
 def links_pointing_to_page(url):
     try:
-        response = requests.get(url).text
+        response = requests.get(url,timeout=3).text
         number_of_links = response.count('<a href=')
         if number_of_links == 0:
             data.append(-1)
@@ -143,7 +143,7 @@ def google_index(url):
 
 def popup_window(url):
     try:
-        response = requests.get(url).text
+        response = requests.get(url,timeout=3).text
         yes = response.count('alert(')
         if yes:
             data.append(-1)
@@ -155,7 +155,7 @@ def popup_window(url):
 
 def right_click(url):
     try:
-        response = requests.get(url).text
+        response = requests.get(url,timeout=3).text
         yes = response.count('event.button==2')
         if yes:
             data.append(1)
@@ -167,7 +167,7 @@ def right_click(url):
 
 def on_mouse_over(url):
     try:
-        response = requests.get(url).text
+        response = requests.get(url,timeout=3).text
         if re.findall('<script>.+onmouseover="window[.]status.+</script>', response):
             data.append(-1)
         else:
@@ -178,7 +178,7 @@ def on_mouse_over(url):
 
 def redirect(url):
     try:
-        length_response = len(requests.get(url).history)
+        length_response = len(requests.get(url,timeout=3).history)
         if length_response <= 1:
             data.append(1)
         elif 2 <= length_response <= 3:
@@ -191,7 +191,7 @@ def redirect(url):
 
 def abnormal_url(url):
     try:
-        response = requests.get(url)
+        response = requests.get(url,timeout=3)
         if response:
             if response.text:
                 data.append(1)
@@ -285,7 +285,7 @@ def domain_registration_length(url):
 
 def request_url(url):
     try:
-        text = requests.get(url).text
+        text = requests.get(url,timeout=3).text
         result = re.findall('"https://.*"', text)
         links = []
         for i in result:
@@ -322,7 +322,7 @@ def request_url(url):
 
 def url_of_anchor(url):
     try:
-        text = requests.get(url).text
+        text = requests.get(url,timeout=3).text
         result = re.findall('<a href=.*"', text)
         links = []
         for i in result:
@@ -360,7 +360,7 @@ def url_of_anchor(url):
 
 def link_in_tag(url):
     try:
-        text = requests.get(url).text
+        text = requests.get(url,timeout=3).text
         info = re.findall('<link .* href=.*"', text)
         result = []
         for i in info:
@@ -398,7 +398,7 @@ def link_in_tag(url):
 
 def sfh(url):
     try:
-        text = requests.get(url).text
+        text = requests.get(url,timeout=3).text
         result = re.findall('<form.* action=".*"', text)
         action_address = []
         for i in result:
@@ -425,7 +425,7 @@ def sfh(url):
 
 def iframe(url):
     try:
-        text = requests.get(url).text
+        text = requests.get(url,timeout=3).text
         iframe_found = text.find('<iframe>') or text.find('<iframes>')
         if iframe_found:
             frameBorder_found = text.find('<frameBorder>')
@@ -500,7 +500,7 @@ def page_rank(url):
 
 def ssl(url):
     try:
-        response = requests.get(url)
+        response = requests.get(url,timeout=3)
         if response != '':
             data.append(1)
     except:
@@ -510,7 +510,7 @@ def ssl(url):
 def favicon(url):
     try:
         original_domain = whois.whois(url).domain
-        info = requests.get(url).text
+        info = requests.get(url,timeout=3).text
         r = re.findall('href=".*ico"', info)
         links = []
         for i in r:
@@ -628,6 +628,11 @@ def go(url):
     links_pointing_to_page(url)
     statistical_report(url)
     print(data)
-    model1.svm(data)
-    model2.random_forest(data)
-    model3.logistic_regression(data)
+    r1 = model1.svm(data)
+    r2 = model2.random_forest(data)
+    r3 = model3.logistic_regression(data)
+    if r1[0] + r2[0] + r3[0] == 3:
+        return 'NORMAL URL'
+    else:
+        return 'PHISHING URL'
+    

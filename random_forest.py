@@ -16,4 +16,6 @@ def random_forest(data):
     model.fit(X_train, Y_train)
     print(model.score(X_test, Y_test))
     data = np.array(data).reshape(1, -1)
-    print(model.predict(data))
+    result = model.predict(data)
+    print(result)
+    return result

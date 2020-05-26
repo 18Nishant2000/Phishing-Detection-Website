@@ -121,8 +121,21 @@
           <center><input class="btn btn-primary btn-round" type="submit" style="display: flex; justify-content: center;"/></center>
         </form>
       </div>
+      {% block content %}
+                  {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                      <div class="alert" style="background-color:orange;padding-top: 0.5cm;">
+                      {% for i in messages %}
+                        <span class="closebtn" onclick="this.parentElement.style.display='none';"> &times;   </span>
+                        {{i}}
+                      {% endfor %}
+                      </div>
+                    {% endif %}
+                  {% endwith %}
+            {% endblock %}
     </div>
   </div>
+  
     
       <div class="section section-download" id="#download-section" data-background-color="black">
         <img src="static/assets/img/path1.png" class="path">
